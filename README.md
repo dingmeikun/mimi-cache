@@ -17,3 +17,5 @@ mimi-cache 是一个高性能、高并发和低侵入性的分布式多级缓存
 
 支持key和value的多序列化方案
 
+支持local-remote多cache实例缓存模式
+
