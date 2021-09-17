@@ -1,0 +1,23 @@
+server:
+  port: 8011
+
+spring:
+  application:
+    name: spring_cache
+
+# 注册中心
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://127.0.0.1:8001/eureka
+
+logging:
+  config: classpath:logback-spring.xml
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
