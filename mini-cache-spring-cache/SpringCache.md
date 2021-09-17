@@ -10,9 +10,20 @@ Spring3.1开始定义了 org.springframework.cache.Cache 和 org.springframework
 * 支持多种本地缓存方案
 
 然后我们了解下他的重要概念和缓存注解
-表格aaa
+
+| 概念/注解      | 作用                                                         |
+| :------------- | :----------------------------------------------------------- |
+| @Cacheable     | 主要针对方法配置，能够根据方法的请求参数对其结果进行缓存     |
+| @CacheEvict    | 清空缓存                                                     |
+| @CachePut      | 保证方法被调用，又希望结果被缓存。                           |
+| @EnableCaching | 开启基于注解的缓存                                           |
+| Cache          | 缓存接口，定义缓存操作。实现有：RedisCache、EhCacheCache、ConcurrentMapCache等 |
+| CacheManager   | 缓存管理器，管理各种缓存(Cache)组件                          |
+| keyGenerator   | 缓存数据时key生成策略                                        |
+| serialize      | 缓存数据时value序列化策略                                    |
 
 了解了上面的特点，接下来我们具体进行配置和开发~
+
 #### 配置
 假设我们已经有了具体的springboot项目，现在进行maven配置
 
@@ -59,7 +70,7 @@ Spring3.1开始定义了 org.springframework.cache.Cache 和 org.springframework
     
         boolean update(User user);
     }
-    
+
 然后是具体实现，这里有三套实现，分别是：springCache缓存，caffeine缓存，spring-caffeine组合缓存
 1.springCache缓存，使用的springCache原生缓存，只需依赖`spring-boot-starter-cache`即可开箱即用。
 
@@ -122,7 +133,7 @@ Spring3.1开始定义了 org.springframework.cache.Cache 和 org.springframework
             return new User(userId, "test", "test", 0);
         }
     }
-    
+
 2.caffeine缓存，spring-context支持的、使用caffeine实现的本地缓存方案，官方将其与市面上的其他缓存做了对比，性能极高。
 
     /**
@@ -190,7 +201,7 @@ Spring3.1开始定义了 org.springframework.cache.Cache 和 org.springframework
             return true;
         }
     }
-    
+
 3.spring-caffeine组合缓存，是基于springCache注解配置，集成自定义的cacheManager(caffeineCacheManager)的一种组合实现
 
     /**
@@ -291,15 +302,15 @@ Spring3.1开始定义了 org.springframework.cache.Cache 和 org.springframework
         @Test
         public void testCaffeineCache() {
             log.info(">>>>>>>>>>>>>>>>>>>> 测试 Caffeine缓存");
-            caffeineCache.findOne(1L);                          (1)
-            User one = caffeineCache.findOne(1L);               (2)
+            caffeineCache.findOne(1L);
+            User one = caffeineCache.findOne(1L);
     
-            User two = caffeineCache.findOne(one);              (3)
+            User two = caffeineCache.findOne(one);
             one.setUserID(2L);
-            User three = caffeineCache.findOne(one);            (4)
+            User three = caffeineCache.findOne(one);
     
-            caffeineCache.remove(1L);                           (5)
-            caffeineCache.findOne(1L);                          (6)
+            caffeineCache.remove(1L);
+            caffeineCache.findOne(1L);
         }
     
         /**
@@ -327,9 +338,10 @@ Spring3.1开始定义了 org.springframework.cache.Cache 和 org.springframework
             System.out.println();
         }
     }
-    
+
 这里针对上面的caffeineCache做了下测试，结果如下：
 
+```
     [2021-09-17 17:18:18][] [main] INFO  com.mimi.spring.cache.CacheTest - >>>>>>>>>>>>>>>>>>>> 测试 Caffeine缓存
     [2021-09-17 17:18:18][] [main] INFO  com.mimi.spring.cache.service.impl.CaffeineCacheImpl - caffeine2查询用户:1
     [2021-09-17 17:18:18][] [main] INFO  com.mimi.spring.cache.config.localValueLoader - caffeine查询DB:1
@@ -339,8 +351,10 @@ Spring3.1开始定义了 org.springframework.cache.Cache 和 org.springframework
     [2021-09-17 17:18:18][] [main] INFO  com.mimi.spring.cache.service.impl.CaffeineCacheImpl - caffeine删除用户:1
     [2021-09-17 17:18:18][] [main] INFO  com.mimi.spring.cache.service.impl.CaffeineCacheImpl - caffeine2查询用户:1
     [2021-09-17 17:18:18][] [main] INFO  com.mimi.spring.cache.config.localValueLoader - caffeine查询DB:1
+```
 
 经过分析caffeineCache测试实现，如下：
+
 * 先走(1)，发现查询时走了DB，打印"caffeine查询DB:1"
 * 再走(2)，发现只打印了查询用户，没有查询DB，所以缓存生效了
 * 再走(3)，仍然还是查询到了相同UserID=1的数据
