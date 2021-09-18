@@ -302,15 +302,15 @@ Spring3.1开始定义了 org.springframework.cache.Cache 和 org.springframework
         @Test
         public void testCaffeineCache() {
             log.info(">>>>>>>>>>>>>>>>>>>> 测试 Caffeine缓存");
-            caffeineCache.findOne(1L);
-            User one = caffeineCache.findOne(1L);
+            caffeineCache.findOne(1L);				(1)
+            User one = caffeineCache.findOne(1L);	 (2)
     
-            User two = caffeineCache.findOne(one);
+            User two = caffeineCache.findOne(one);	 (3)
             one.setUserID(2L);
-            User three = caffeineCache.findOne(one);
+            User three = caffeineCache.findOne(one); (4)
     
-            caffeineCache.remove(1L);
-            caffeineCache.findOne(1L);
+            caffeineCache.remove(1L);				(5)
+            caffeineCache.findOne(1L);				(6)
         }
     
         /**

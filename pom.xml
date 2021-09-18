@@ -18,7 +18,9 @@
 	</parent>
 	
 	<modules>
+		<module>mini-cache-core</module>
 		<module>mini-cache-spring-cache</module>
+        <module>mini-cache-starter</module>
     </modules>
 	
 	<properties>
